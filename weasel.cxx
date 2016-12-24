@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <string>
 #include <fstream>
 using namespace std;
 
@@ -15,9 +16,8 @@ using namespace std;
 
 // == Main ==
 int main(){
-  cout << "Hello world!" << endl;
 
-
+  
 
   return 0;
 }
