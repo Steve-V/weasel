@@ -17,6 +17,7 @@ using namespace std;
 // == Function prototypes ==
 
 string buildRandomString(int length);
+void mutate(string& scrambled, const string target);
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -37,7 +38,11 @@ int main(){
   
   string target("Methinks it is like a weasel");
 
-  cout << buildRandomString( target.length() ) << endl;
+  string scrambled = buildRandomString( target.length() );
+
+  while( fitness(target,scrambled) != 0 ) {
+    mutate(scrambled, target);
+  }
 
   return 0;
 }
@@ -69,4 +74,6 @@ string buildRandomString(int length){
 
 } //end buildRandomString
 
+void mutate(string& scrambled, const string target){
 
+}
