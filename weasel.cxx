@@ -40,7 +40,7 @@ int main(){
 
   string scrambled = buildRandomString( target.length() );
 
-  while( fitness(target,scrambled) != 0 ) {
+  while( target.compare(scrambled) != 0 ) {
     mutate(scrambled, target);
   }
 
