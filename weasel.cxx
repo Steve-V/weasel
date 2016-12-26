@@ -18,7 +18,7 @@ using namespace std;
 // == Function prototypes ==
 
 string buildRandomString(int length);
-void mutate(string& scrambled, const string target);
+void evolve(string& scrambled, const string target);
 const int score(const string scrambled, const string target);
 const int getDistance(const char first, const char second);
 
@@ -45,9 +45,9 @@ int main(){
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
-  while( attempts < 1 && target.compare(scrambled) != 0 ) {
-    cout << ++attempts << ": " << scrambled << " does not match! Score: " << score(scrambled,target) << endl;
-    mutate(scrambled, target);
+  while( attempts < 3 && target.compare(scrambled) != 0 ) {
+    //cout << ++attempts << ": " << scrambled << " does not match! Score: " << score(scrambled,target) << endl;
+    evolve(scrambled, target);
   }
 
   cout << scrambled << " matches!" << endl;
@@ -84,9 +84,15 @@ string buildRandomString(int length){
 
 } //end buildRandomString
 
-void mutate(string& scrambled, const string target){
-  scrambled = buildRandomString( target.length() );
-  return;
+void evolve(string& scrambled, const string target){
+  //scrambled = buildRandomString( target.length() );
+  int litterSize = 5;
+  vector<string> children = spawn(scrambled,litterSize);
+  return cull(children);
+}
+
+vector<string> spawn(const string& scrambled, const int litterSize){
+
 }
 
 const int score(const string scrambled, const string target){
@@ -96,9 +102,9 @@ const int score(const string scrambled, const string target){
   int score = 0;
 
   for (; it < scrambled.end(); it++, targetit++){
-    cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
+    //cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
     if (*it != *targetit){
-      cout << "Score: " << getDistance(*it,*targetit) << endl;
+      //cout << "Score: " << getDistance(*it,*targetit) << endl;
       score += getDistance(*it,*targetit);
     }
   }
