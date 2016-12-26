@@ -115,17 +115,21 @@ vector<string> spawn(const string scrambled){
 string mutateString(const string scrambled){
   std::default_random_engine gen;
   std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
-  const int mutateChance = 7; // percent chance of mutation
+  const int mutateChance = 99; // percent chance of mutation
   vector<char> alphanumerics = getAlphanumerics();
   string mutated = scrambled;
 
+  int butts = 0;
   for (char& eachletter : mutated){
-    if (dist(gen) < mutateChance) {
+    butts = dist(gen);
+    cout << "Butts: " << butts << endl;
+    if (butts < mutateChance) {
       eachletter =  *select_randomly(alphanumerics.begin(), alphanumerics.end()) ;
     }
   }
   return mutated;
 }
+
 
 string cull(vector<string> children){
   return *std::min_element(children.begin(),children.end(),compareScores);
