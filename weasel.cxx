@@ -46,14 +46,18 @@ Iter select_randomly(Iter start, Iter end) {
 // == Main ==
 int main(){
   
-  //string target("Methinks it is like a weasel");
-  string target("weasel");
+  string target("Methinks it is like a weasel");
+  //string target("weasel");
 
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
   while( /*attempts++ < 999 &&*/ target.compare(scrambled) != 0 ) {
-    cout << ++attempts << ": " << scrambled << " : " << score(scrambled) << endl;
+    ++attempts;
+    if (attempts > 1000) {
+    cout << attempts << ": " << scrambled << " : " << score(scrambled) << endl;
+    attempts = 1;
+    }
     evolve(scrambled, target);
   }
 
@@ -94,7 +98,8 @@ string buildRandomString(int length){
 void evolve(string& parent, const string target){
   vector<string> children = spawn(parent);
   //cout << "Original: " << parent << " | Children: " << endl;
-  //for (string eachchild : children) { cout << eachchild << " | ";}
+  //for (string eachchild : children) { cout << eachchild << ":" << score(eachchild) << " | ";}
+  
   //cout << endl;
   children.push_back(parent);
   parent = cull(children);
@@ -102,7 +107,7 @@ void evolve(string& parent, const string target){
 }
 
 vector<string> spawn(const string scrambled){
-  int litterSize = 5;
+  const int litterSize = 99;
   vector<string> children = {};
 
   for (int i = 0; i < litterSize; i++){
@@ -115,15 +120,15 @@ vector<string> spawn(const string scrambled){
 string mutateString(const string scrambled){
   std::default_random_engine gen;
   std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
-  const int mutateChance = 99; // percent chance of mutation
+  const int mutateChance = 50; // percent chance of mutation
   vector<char> alphanumerics = getAlphanumerics();
   string mutated = scrambled;
 
-  int butts = 0;
+  int chance  = 0;
   for (char& eachletter : mutated){
-    butts = dist(gen);
-    cout << "Butts: " << butts << endl;
-    if (butts < mutateChance) {
+    chance = dist(gen);
+    //cout << "Butts: " << butts << endl;
+    if (chance < mutateChance) {
       eachletter =  *select_randomly(alphanumerics.begin(), alphanumerics.end()) ;
     }
   }
@@ -138,7 +143,8 @@ string cull(vector<string> children){
 
 const int score(const string candidate){
 
-  const string target = "weasel"; //need to find a way not to duplicate this
+  //const string target = "weasel"; //need to find a way not to duplicate this
+  const string target("Methinks it is like a weasel");
 
   string::const_iterator it = candidate.begin();
   string::const_iterator targetit = target.begin();
@@ -148,7 +154,8 @@ const int score(const string candidate){
     //cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
     if (*it != *targetit){
       //cout << "Score: " << getDistance(*it,*targetit) << endl;
-      score += getDistance(*it,*targetit);
+      //score += getDistance(*it,*targetit);
+      score += 1;
     }
   }
   return score;
