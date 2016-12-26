@@ -111,6 +111,6 @@ const int getDistance(const char firstchar, const char secondchar){
   vector<char>::iterator firstit, secondit;
   firstit = find(alphabet.begin(), alphabet.end(), firstchar);
   secondit = find(alphabet.begin(), alphabet.end(), secondchar);
-  return distance(firstit,secondit);
+  return abs( distance(firstit,secondit) );
 }
 
