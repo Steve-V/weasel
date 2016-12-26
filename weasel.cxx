@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iterator>
 #include <vector>
+#include <algorithm>
 #include <random>
 using namespace std;
 
@@ -19,6 +20,7 @@ using namespace std;
 string buildRandomString(int length);
 void mutate(string& scrambled, const string target);
 const int score(const string scrambled, const string target);
+const int getDistance(const char first, const char second);
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -37,12 +39,13 @@ Iter select_randomly(Iter start, Iter end) {
 // == Main ==
 int main(){
   
-  string target("Methinks it is like a weasel");
+  //string target("Methinks it is like a weasel");
+  string target("weasel");
 
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
-  while( attempts < 3 && target.compare(scrambled) != 0 ) {
+  while( attempts < 1 && target.compare(scrambled) != 0 ) {
     cout << ++attempts << ": " << scrambled << " does not match! Score: " << score(scrambled,target) << endl;
     mutate(scrambled, target);
   }
@@ -90,13 +93,24 @@ const int score(const string scrambled, const string target){
 
   string::const_iterator it = scrambled.begin();
   string::const_iterator targetit = target.begin();
-  //int score = 0;
+  int score = 0;
 
   for (; it < scrambled.end(); it++, targetit++){
     cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
-
+    if (*it != *targetit){
+      cout << "Score: " << getDistance(*it,*targetit) << endl;
+      score += getDistance(*it,*targetit);
+    }
   }
   cout << endl;
-  return 0;
+  return score;
+}
+
+const int getDistance(const char firstchar, const char secondchar){
+  vector<char> alphabet = getAlphanumerics();
+  vector<char>::iterator firstit, secondit;
+  firstit = find(alphabet.begin(), alphabet.end(), firstchar);
+  secondit = find(alphabet.begin(), alphabet.end(), secondchar);
+  return distance(firstit,secondit);
 }
 
