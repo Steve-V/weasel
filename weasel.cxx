@@ -19,8 +19,15 @@ using namespace std;
 
 string buildRandomString(int length);
 void evolve(string& scrambled, const string target);
-const int score(const string scrambled, const string target);
+const int score(const string scrambled);
 const int getDistance(const char first, const char second);
+void evolve(string& scrambled, const string target);
+vector<string> spawn(const string scrambled);
+string mutateString(const string scrambled);
+string cull(vector<string> children);
+
+// == Tiny functions ==
+bool compareScores(const string& first, const string& second){return(score(first)<score(second));}
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -45,12 +52,12 @@ int main(){
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
-  while( attempts < 3 && target.compare(scrambled) != 0 ) {
-    //cout << ++attempts << ": " << scrambled << " does not match! Score: " << score(scrambled,target) << endl;
+  while( /*attempts++ < 999 &&*/ target.compare(scrambled) != 0 ) {
+    cout << ++attempts << ": " << scrambled << " : " << score(scrambled) << endl;
     evolve(scrambled, target);
   }
 
-  cout << scrambled << " matches!" << endl;
+  cout << scrambled << endl;
 
   return 0;
 }
@@ -84,31 +91,62 @@ string buildRandomString(int length){
 
 } //end buildRandomString
 
-void evolve(string& scrambled, const string target){
-  //scrambled = buildRandomString( target.length() );
+void evolve(string& parent, const string target){
+  vector<string> children = spawn(parent);
+  //cout << "Original: " << parent << " | Children: " << endl;
+  //for (string eachchild : children) { cout << eachchild << " | ";}
+  //cout << endl;
+  children.push_back(parent);
+  parent = cull(children);
+  return;
+}
+
+vector<string> spawn(const string scrambled){
   int litterSize = 5;
-  vector<string> children = spawn(scrambled,litterSize);
-  return cull(children);
+  vector<string> children = {};
+
+  for (int i = 0; i < litterSize; i++){
+    children.push_back( mutateString(scrambled) );
+  }
+
+  return children;
 }
 
-vector<string> spawn(const string& scrambled, const int litterSize){
+string mutateString(const string scrambled){
+  std::default_random_engine gen;
+  std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
+  const int mutateChance = 7; // percent chance of mutation
+  vector<char> alphanumerics = getAlphanumerics();
+  string mutated = scrambled;
 
+  for (char& eachletter : mutated){
+    if (dist(gen) < mutateChance) {
+      eachletter =  *select_randomly(alphanumerics.begin(), alphanumerics.end()) ;
+    }
+  }
+  return mutated;
 }
 
-const int score(const string scrambled, const string target){
+string cull(vector<string> children){
+  return *std::min_element(children.begin(),children.end(),compareScores);
+}
 
-  string::const_iterator it = scrambled.begin();
+
+const int score(const string candidate){
+
+  const string target = "weasel"; //need to find a way not to duplicate this
+
+  string::const_iterator it = candidate.begin();
   string::const_iterator targetit = target.begin();
   int score = 0;
 
-  for (; it < scrambled.end(); it++, targetit++){
+  for (; it < candidate.end(); it++, targetit++){
     //cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
     if (*it != *targetit){
       //cout << "Score: " << getDistance(*it,*targetit) << endl;
       score += getDistance(*it,*targetit);
     }
   }
-  cout << endl;
   return score;
 }
 
