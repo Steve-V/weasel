@@ -45,28 +45,25 @@ Iter select_randomly(Iter start, Iter end) {
 
 // == Main ==
 int main(){
+  /* Set target, create initial random string, run evolution and keep count*/
   
   string target("Methinks it is like a weasel");
-  //string target("weasel");
 
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
-  while( /*attempts++ < 9 &&*/ target.compare(scrambled) != 0 ) {
-    //++attempts;
-    //if (attempts > 1000) {
+  while( target.compare(scrambled) != 0 ) {
     cout << attempts++ << ": " << scrambled << " : " << score(scrambled) << endl;
-    //attempts = 0;
-    //}
     evolve(scrambled, target);
   }
 
-  cout << scrambled << endl;
+  cout << "Solved in " << attempts << " attempts!" << endl;
 
   return 0;
 }
 
 vector<char> getAlphanumerics(){
+  // Return the candidate alphabet from which random letters (and space) are pulled
   return vector<char> {
     'A','B','C','D','E','F',
     'G','H','I','J','K',
@@ -79,7 +76,7 @@ vector<char> getAlphanumerics(){
     'q','r','s','t','u',
     'v','w','x','y','z',
     ' '
-  }; //include space in the alphabet
+  }; 
 }
 
 string buildRandomString(int length){
@@ -88,25 +85,23 @@ string buildRandomString(int length){
 
   string randstring = "";
   for (auto i = 0; i < length; i++){
+    // push random letters onto the string until we reach the target string length
     randstring.push_back( *select_randomly(alphanumerics.begin(), alphanumerics.end()) );
   }
 
   return randstring;
 
-} //end buildRandomString
+} 
 
 void evolve(string& parent, const string target){
-  vector<string> children = spawn(parent);
-  //cout << "Original: " << parent << " | Children: " << endl;
-  //for (string eachchild : children) { cout << eachchild << ":" << score(eachchild) << " | ";}
-  
-  //cout << endl;
-  children.push_back(parent);
-  parent = cull(children);
+  vector<string> children = spawn(parent); // populate a vector of children based on parent
+  children.push_back(parent); // parent might be a better fit than any of its children
+  parent = cull(children); // replace parent with the best fit of it's children (savage!)
   return;
 }
 
 vector<string> spawn(const string scrambled){
+  // given a string, populate and return a vector with mutated children based on it
   const int litterSize = 99;
   vector<string> children = {};
 
@@ -117,42 +112,41 @@ vector<string> spawn(const string scrambled){
   return children;
 }
 
-string mutateString(const string scrambled){
-  static std::default_random_engine gen;
-  static std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
+string mutateString(const string parent){
+  static std::default_random_engine gen; //initialize a rand generator as static (one per program) 
+  static std::uniform_int_distribution<int> dist(0,100); // force random numbers to fit 0-100 distribution
   const int mutateChance = 5; // percent chance of mutation
   vector<char> alphanumerics = getAlphanumerics();
-  string mutated = scrambled;
+  string mutated = parent; // child string begins as an unaltered copy of parent string
 
-  int chance  = 0;
+  int dice  = 0;
   for (auto& eachletter : mutated){
-    //cout << "Current letter: " << eachletter << endl;
-    chance = dist(gen);
-    if (chance < mutateChance) {
+    dice = dist(gen); // roll the dice
+    if (dice < mutateChance) {
       eachletter =  *select_randomly(alphanumerics.begin(), alphanumerics.end()) ;
     }
-    //cout << "New letter: " << eachletter << endl;
   }
   return mutated;
 }
 
 
 string cull(vector<string> children){
+  // from a vector of many children, select the one which has the lowest score
+  // it's nice when the language has exactly an algorithm to do the task you need
+  // we only need to pass a function to tell it how to do the comparison
   return *std::min_element(children.begin(),children.end(),compareScores);
 }
 
 
 const int score(const string candidate){
 
-  //const string target = "weasel"; //need to find a way not to duplicate this
-  const string target("Methinks it is like a weasel");
+  const string target("Methinks it is like a weasel"); //need to find a way not to duplicate this
 
   string::const_iterator it = candidate.begin();
   string::const_iterator targetit = target.begin();
   int score = 0;
 
   for (; it < candidate.end(); it++, targetit++){
-    //cout << "Scrambled: " << *it << " | Target: " << *targetit << endl;
     if (*it != *targetit){
       //cout << "Score: " << getDistance(*it,*targetit) << endl;
       //score += getDistance(*it,*targetit);
@@ -163,6 +157,11 @@ const int score(const string candidate){
 }
 
 const int getDistance(const char firstchar, const char secondchar){
+  // Currently unused but might be used in the future
+  // Currently score works by checking if each letter is right or wrong in a yes/no fashion
+  // if you wanted to get fancier, you could determine how close a letter is to correct
+  // this function attempts to do that.
+  // Does not properly handle Z->A comparisons
   vector<char> alphabet = getAlphanumerics();
   vector<char>::iterator firstit, secondit;
   firstit = find(alphabet.begin(), alphabet.end(), firstchar);
