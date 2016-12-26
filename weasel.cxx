@@ -52,12 +52,12 @@ int main(){
   string scrambled = buildRandomString( target.length() );
 
   int attempts = 0;
-  while( /*attempts++ < 999 &&*/ target.compare(scrambled) != 0 ) {
-    ++attempts;
-    if (attempts > 1000) {
-    cout << attempts << ": " << scrambled << " : " << score(scrambled) << endl;
-    attempts = 1;
-    }
+  while( /*attempts++ < 9 &&*/ target.compare(scrambled) != 0 ) {
+    //++attempts;
+    //if (attempts > 1000) {
+    cout << attempts++ << ": " << scrambled << " : " << score(scrambled) << endl;
+    //attempts = 0;
+    //}
     evolve(scrambled, target);
   }
 
@@ -118,19 +118,20 @@ vector<string> spawn(const string scrambled){
 }
 
 string mutateString(const string scrambled){
-  std::default_random_engine gen;
-  std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
-  const int mutateChance = 50; // percent chance of mutation
+  static std::default_random_engine gen;
+  static std::uniform_int_distribution<int> dist(0,100); //initialize a rand generator betwen 0 and 100
+  const int mutateChance = 5; // percent chance of mutation
   vector<char> alphanumerics = getAlphanumerics();
   string mutated = scrambled;
 
   int chance  = 0;
-  for (char& eachletter : mutated){
+  for (auto& eachletter : mutated){
+    //cout << "Current letter: " << eachletter << endl;
     chance = dist(gen);
-    //cout << "Butts: " << butts << endl;
     if (chance < mutateChance) {
       eachletter =  *select_randomly(alphanumerics.begin(), alphanumerics.end()) ;
     }
+    //cout << "New letter: " << eachletter << endl;
   }
   return mutated;
 }
