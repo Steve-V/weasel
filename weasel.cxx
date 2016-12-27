@@ -24,7 +24,9 @@ const int getDistance(const char first, const char second);
 void evolve(string& scrambled, const string target);
 vector<string> spawn(const string scrambled);
 string mutateString(const string scrambled);
+string breedString(const string mom, const string dad);
 string cull(vector<string> children);
+void breed(vector<string> parents);
 
 // == Tiny functions ==
 bool compareScores(const string& first, const string& second){return(score(first)<score(second));}
@@ -96,6 +98,7 @@ string buildRandomString(int length){
 void evolve(string& parent, const string target){
   vector<string> children = spawn(parent); // populate a vector of children based on parent
   children.push_back(parent); // parent might be a better fit than any of its children
+  breed(children); // allow children to reproduce
   parent = cull(children); // replace parent with the best fit of it's children (savage!)
   return;
 }
@@ -127,6 +130,20 @@ string mutateString(const string parent){
     }
   }
   return mutated;
+}
+
+string breedString(const string mom, const string dad){
+  static std::default_random_engine gen; //initialize a rand generator as static (one per program) 
+  static std::bernoulli_distribution coin(0.5); // force random numbers to fit true/false distribution with equal likelihood
+  string baby = ""; // child string begins as blank
+
+  string::const_iterator momIt = mom.begin();
+  string::const_iterator dadIt = dad.begin();
+
+  for (; momIt < mom.end(); momIt++, dadIt++){ // fault if dad is shorter than mom
+    coin(gen) ? baby.push_back(*momIt) : baby.push_back(*dadIt);
+    }
+  return baby;
 }
 
 
@@ -167,5 +184,18 @@ const int getDistance(const char firstchar, const char secondchar){
   firstit = find(alphabet.begin(), alphabet.end(), firstchar);
   secondit = find(alphabet.begin(), alphabet.end(), secondchar);
   return abs( distance(firstit,secondit) );
+}
+
+void breed(vector<string> parents){
+  auto cutoff = std::next(parents.begin(), parents.size()/3); // iterator to 1/3rd of the vector
+  std::partial_sort(parents.begin(), cutoff, parents.end(), compareScores); //sort the first 3rd
+
+  std::vector<string>::iterator ita = parents.begin();
+  std::vector<string>::iterator itb = parents.begin()+1;
+
+  for (; ita < cutoff; ita++, itb++){
+    parents.push_back( breedString( *ita, *itb ) );
+  }
+  return;
 }
 
