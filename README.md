@@ -3,6 +3,5 @@ Methinks it is like a weasel!
 
 **Usage**
 
-g++ weasel
+g++ -std=c++11 weasel.cxx
 
-(Requires c++11 compiler)
