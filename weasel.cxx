@@ -57,7 +57,7 @@ int main(){
     evolve(scrambled, target);
   }
 
-  cout << "Solved in " << attempts << " attempts!" << endl;
+  cout << scrambled << " : Solved in " << attempts << " attempts!" << endl;
 
   return 0;
 }
